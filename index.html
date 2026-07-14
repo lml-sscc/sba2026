@@ -157,11 +157,11 @@
 
     <div class="sidebar">
         <h2>線上預約系統手冊</h2>
-        <a href="#intro" class="active" onclick="showSection('intro')">1. 課程引言與目標</a>
-        <a href="#ddl" onclick="showSection('ddl')">2. 步驟2: DDL 資料表建立</a>
-        <a href="#db-php" onclick="showSection('db-php')">3. 步驟5: 資料庫連線 (db.php)</a>
-        <a href="#search-php" onclick="showSection('search-php')">4. 步驟6: 動態搜尋 (search.php)</a>
-        <a href="#reserve-php" onclick="showSection('reserve-php')">5. 步驟7: 預約處理 (reserve.php)</a>
+        <a href="#" class="active" onclick="showSection(event, 'intro')">1. 課程引言與目標</a>
+        <a href="#" onclick="showSection(event, 'ddl')">2. 步驟2: DDL 資料表建立</a>
+        <a href="#" onclick="showSection(event, 'db-php')">3. 步驟5: 資料庫連線 (db.php)</a>
+        <a href="#" onclick="showSection(event, 'search-php')">4. 步驟6: 動態搜尋 (search.php)</a>
+        <a href="#" onclick="showSection(event, 'reserve-php')">5. 步驟7: 預約處理 (reserve.php)</a>
     </div>
 
     <div class="main-content">
@@ -184,7 +184,7 @@
             <div class="code-container">
                 <div class="code-header">
                     <span>MySQL DDL (customers, tables, reservations)</span>
-                    <button class="copy-btn" onclick="copyCode('ddl-code')"><i class="fa-regular fa-copy"></i> 複製</button>
+                    <button class="copy-btn" onclick="copyCode(event, 'ddl-code')"><i class="fa-regular fa-copy"></i> 複製</button>
                 </div>
 <pre id="ddl-code">-- 建立顧客資料表
 CREATE TABLE customers (
@@ -221,7 +221,7 @@ CREATE TABLE reservations (
             <div class="code-container">
                 <div class="code-header">
                     <span>db.php</span>
-                    <button class="copy-btn" onclick="copyCode('db-code')"><i class="fa-regular fa-copy"></i> 複製</button>
+                    <button class="copy-btn" onclick="copyCode(event, 'db-code')"><i class="fa-regular fa-copy"></i> 複製</button>
                 </div>
 <pre id="db-code">&lt;?php
 $host = "localhost";
@@ -249,7 +249,7 @@ $conn->set_charset("utf8mb4");
             <div class="code-container">
                 <div class="code-header">
                     <span>search.php</span>
-                    <button class="copy-btn" onclick="copyCode('search-code')"><i class="fa-regular fa-copy"></i> 複製</button>
+                    <button class="copy-btn" onclick="copyCode(event, 'search-code')"><i class="fa-regular fa-copy"></i> 複製</button>
                 </div>
 <pre id="search-code">&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-Hant"&gt;
@@ -324,7 +324,7 @@ $conn->set_charset("utf8mb4");
             <div class="code-container">
                 <div class="code-header">
                     <span>reserve.php</span>
-                    <button class="copy-btn" onclick="copyCode('reserve-code')"><i class="fa-regular fa-copy"></i> 複製</button>
+                    <button class="copy-btn" onclick="copyCode(event, 'reserve-code')"><i class="fa-regular fa-copy"></i> 複製</button>
                 </div>
 <pre id="reserve-code">&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-Hant"&gt;
@@ -374,7 +374,7 @@ $conn->set_charset("utf8mb4");
             &lt;option value="1"&gt;餐桌 1 (2人座位)&lt;/option&gt;
             &lt;option value="3"&gt;餐桌 3 (4人座位)&lt;/option&gt;
             &lt;option value="6"&gt;餐桌 6 (6人座位)&lt;/option&gt;
-        &lt;/select&gt;
+        &lt;/select>
         
         &lt;label&gt;用餐人數:&lt;/label&gt;
         &lt;input type="number" name="party_size" min="1" max="20" required&gt;
@@ -428,21 +428,25 @@ $conn->set_charset("utf8mb4");
 
     <script>
         // SPA Tab switching logic
-        function showSection(sectionId) {
+        // 修正點：加入 e 參數並呼叫 e.preventDefault()
+        function showSection(e, sectionId) {
+            e.preventDefault(); // 阻止 <a> 標籤的預設跳轉/刷新行為
+            
             const sections = document.querySelectorAll('.section');
             sections.forEach(sec => sec.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
 
             const menuItems = document.querySelectorAll('.sidebar a');
             menuItems.forEach(item => item.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            e.currentTarget.classList.add('active'); // 確保抓到正確的點擊元素
         }
 
         // Copy logic
-        function copyCode(elementId) {
+        // 修正點：同樣傳入 e 確保與全域變數隔開，增加穩定性
+        function copyCode(e, elementId) {
             const codeText = document.getElementById(elementId).innerText;
             navigator.clipboard.writeText(codeText).then(() => {
-                const btn = event.currentTarget;
+                const btn = e.currentTarget;
                 const originalHTML = btn.innerHTML;
                 btn.innerHTML = '<i class="fa-solid fa-check"></i> 已複製';
                 btn.style.backgroundColor = '#2ecc71';
