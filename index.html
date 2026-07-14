@@ -159,32 +159,31 @@
         <h2>線上預約系統手冊</h2>
         <a href="#intro" class="active" onclick="showSection('intro')">1. 課程引言與目標</a>
         <a href="#ddl" onclick="showSection('ddl')">2. 步驟2: DDL 資料表建立</a>
-        <a href="#db-php" onclick="showSection('db-php')">3. 步驟5.1: 資料庫連線 (db.php)</a>
-        <a href="#index-html" onclick="showSection('index-html')">4. 步驟5.2: 系統首頁 (index.html)</a>
-        <a href="#search-php" onclick="showSection('search-php')">5. 步驟6: 動態搜尋 (search.php)</a>
-        <a href="#reserve-php" onclick="showSection('reserve-php')">6. 步驟7: 預約處理 (reserve.php)</a>
+        <a href="#db-php" onclick="showSection('db-php')">3. 步驟5: 資料庫連線 (db.php)</a>
+        <a href="#search-php" onclick="showSection('search-php')">4. 步驟6: 動態搜尋 (search.php)</a>
+        <a href="#reserve-php" onclick="showSection('reserve-php')">5. 步驟7: 預約處理 (reserve.php)</a>
     </div>
 
     <div class="main-content">
         
         <div id="intro" class="section active">
             <h1>課程引言與核心目標</h1>
-            <p>歡迎來到網頁開發專案！在這個單元中，你將學會如何利用 PHP 與 MySQL 連線，建置一個具有實作價值的動態預約系統。</p>
+            <p>歡迎來到網頁開發專案！在這個專案中，你將學會如何利用 PHP 與 MySQL 連線，建置一個<strong>動態預約系統</strong>。</p>
             <div class="info-box">
                 <strong>🏫 專案任務分配：</strong><br>
-                • <strong>老師範例：</strong> 餐廳訂座系統 (Restaurant Reservation System)<br>
+                • <strong>教師示範：</strong> 餐廳訂座系統 (Restaurant Reservation System)<br>
                 • <strong>學生專題：</strong> 酒店房間預訂系統 (Hotel Booking System)
             </div>
-            <p>請點擊左側導覽列跳轉至各步驟，使用右上角的「複製」按鈕，即可輕鬆將原始碼帶入你的開發環境！</p>
+            <p>請使用左側導覽列跳轉到對應的實作步驟，並一鍵複製範例代碼。</p>
         </div>
 
         <div id="ddl" class="section">
             <h1>步驟 2: DDL 資料表實作</h1>
-            <p>請在 MySQL (例如 phpMyAdmin 或 MySQL Workbench) 中執行以下 DDL 語句來建立系統所需的 3 張實體資料表：</p>
+            <p>請在 phpMyAdmin 的資料庫中執行以下 SQL DDL 語句來建立基礎資料表：</p>
             
             <div class="code-container">
                 <div class="code-header">
-                    <span>MySQL DDL</span>
+                    <span>MySQL DDL (customers, tables, reservations)</span>
                     <button class="copy-btn" onclick="copyCode('ddl-code')"><i class="fa-regular fa-copy"></i> 複製</button>
                 </div>
 <pre id="ddl-code">-- 建立顧客資料表
@@ -194,7 +193,7 @@ CREATE TABLE customers (
     phone VARCHAR(20) NOT NULL UNIQUE
 );
 
--- 建立餐桌資料表
+-- 建立餐桌/房間資料表
 CREATE TABLE tables (
     table_id INT AUTO_INCREMENT PRIMARY KEY,
     table_number VARCHAR(10) NOT NULL UNIQUE,
@@ -216,8 +215,8 @@ CREATE TABLE reservations (
         </div>
 
         <div id="db-php" class="section">
-            <h1>步驟 5.1: 資料庫連線設定 (db.php)</h1>
-            <p>為了避免在每個檔案重複編寫連線代碼，在 <code>xampp\htdocs\hotel_system</code> 資料夾內建立 <code>db.php</code> 共用檔：</p>
+            <h1>步驟 5: 建立 db.php 共用連線檔</h1>
+            <p>請在專案根目錄下建立 <code>db.php</code>，用於提供統一的 MySQLi 物件導向連線物件：</p>
             
             <div class="code-container">
                 <div class="code-header">
@@ -228,10 +227,10 @@ CREATE TABLE reservations (
 $host = "localhost";
 $username = "root";
 $password = "";
-$dbname = "hotel_db"; // 你的酒店/餐廳資料庫名稱
+$dbname = "hotel_db"; // 你的酒店資料庫名稱
 
 // 使用物件導向 (Object-Oriented) 建立連線
-$conn = new mysqli($host,$username, $password,$dbname);
+$conn = new mysqli($host, $username, $password, $dbname);
 
 if ($conn->connect_error) {
     die("資料庫連接失敗: " . $conn->connect_error);
@@ -243,72 +242,9 @@ $conn->set_charset("utf8mb4");
             </div>
         </div>
 
-        <div id="index-html" class="section">
-            <h1>步驟 5.2: 系統入口網頁 (index.html)</h1>
-            <p>這是系統的前端入口首頁，提供美觀、直覺的導覽，引導使用者前往「登記預約」或「搜尋紀錄」：</p>
-            
-            <div class="code-container">
-                <div class="code-header">
-                    <span>index.html</span>
-                    <button class="copy-btn" onclick="copyCode('index-code')"><i class="fa-regular fa-copy"></i> 複製</button>
-                </div>
-<pre id="index-code">&lt;!DOCTYPE html&gt;
-&lt;html lang="zh-Hant"&gt;
-&lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;美味餐廳 - 訂座系統&lt;/title&gt;
-    &lt;style&gt;
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            text-align: center;
-            padding-top: 15vh;
-        }
-        .container {
-            background: white;
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 40px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        h1 { color: #333; margin-bottom: 10px; }
-        p { color: #777; font-size: 14px; margin-bottom: 30px; }
-        .btn {
-            display: block;
-            padding: 14px;
-            margin: 12px 0;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            transition: opacity 0.2s;
-        }
-        .btn:hover { opacity: 0.9; }
-        .btn-reserve { background-color: #4CAF50; } /* 綠色 */
-        .btn-search { background-color: #2196F3; }  /* 藍色 */
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-
-&lt;div class="container"&gt;
-    &lt;h1&gt;🍽️ 美味餐廳&lt;/h1&gt;
-    &lt;p&gt;線上預約系統首頁&lt;/p&gt;
-    
-    &lt;!-- 導覽按鈕 --&gt;
-    &lt;a href="reserve.php" class="btn btn-reserve"&gt;📅 立即登記預約&lt;/a&gt;
-    &lt;a href="search.php" class="btn btn-search"&gt;🔍 搜尋預約紀錄&lt;/a&gt;
-&lt;/div&gt;
-
-&lt;/body&gt;
-&lt;/html&gt;</pre>
-            </div>
-        </div>
-
         <div id="search-php" class="section">
-            <h1>步驟 6: 動態搜尋網頁 (search.php)</h1>
-            <p>使用 <strong>GET 方法</strong> 傳遞並取得顧客電話號碼，並透過自訂函式動態繪製關聯表格：</p>
+            <h1>步驟 6: 實作動態搜尋網頁 (search.php)</h1>
+            <p>使用 <strong>GET 方法</strong> 傳遞電話號碼進行跨表 (JOIN) 動態搜尋：</p>
             
             <div class="code-container">
                 <div class="code-header">
@@ -317,7 +253,7 @@ $conn->set_charset("utf8mb4");
                 </div>
 <pre id="search-code">&lt;!DOCTYPE html&gt;
 &lt;html lang="zh-Hant"&gt;
-&lt;head&gt;
+&lt;head>
     &lt;meta charset="UTF-8"&gt;
     &lt;title&gt;結構化搜尋預約紀錄&lt;/title&gt;
     &lt;style&gt;
@@ -330,7 +266,7 @@ $conn->set_charset("utf8mb4");
     &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
-&lt;div class="container"&gt;
+<div class="container">
     &lt;h2&gt;搜尋餐廳訂座紀錄&lt;/h2&gt;
     &lt;form method="GET" action="search.php"&gt;
         &lt;label&gt;請輸入顧客電話號碼進行搜尋:&lt;/label&gt;
@@ -341,22 +277,23 @@ $conn->set_charset("utf8mb4");
     &lt;?php
     if (isset($_GET['search_phone'])) {
         require_once 'db.php';
-        $phone = $_GET['search_phone'];$queryResult = fetchReservations($conn,$phone);
-        renderTable($queryResult);$conn->close();
+        $phone = $_GET['search_phone'];
+        $queryResult = fetchReservations($conn, $phone);
+        renderTable($queryResult);
+        $conn->close();
     }
 
-    // 函式1: 負責跨表查詢撈出資料
-    function fetchReservations($conn, $phone) {$sql = "SELECT c.fullname, r.reservation_date, r.reservation_time, r.party_size, t.table_number 
+    function fetchReservations($conn, $phone) {
+        $sql = "SELECT c.fullname, r.reservation_date, r.reservation_time, r.party_size, t.table_number 
                 FROM reservations r
                 JOIN customers c ON r.customer_id = c.customer_id
                 JOIN tables t ON r.table_id = t.table_id
                 WHERE c.phone = '$phone'";
-        return mysqli_query($conn,$sql);
+        return mysqli_query($conn, $sql);
     }
 
-    // 函式2: 負責將資料渲染成 HTML 表格
     function renderTable($result) {
-        if (mysqli_num_rows($result) &gt; 0) {
+        if (mysqli_num_rows($result) > 0) {
             echo "&lt;h3&gt;搜尋結果如下:&lt;/h3&gt;";
             echo "&lt;table&gt;&lt;tr&gt;&lt;th&gt;姓名&lt;/th&gt;&lt;th&gt;桌號&lt;/th&gt;&lt;th&gt;日期&lt;/th&gt;&lt;th&gt;時間&lt;/th&gt;&lt;th&gt;人數&lt;/th&gt;&lt;/tr&gt;";
             while($row = mysqli_fetch_assoc($result)) {
@@ -374,15 +311,15 @@ $conn->set_charset("utf8mb4");
         }
     }
     ?&gt;
-&lt;/div&gt;
+</div>
 &lt;/body&gt;
 &lt;/html&gt;</pre>
             </div>
         </div>
 
         <div id="reserve-php" class="section">
-            <h1>步驟 7: 預約處理網頁 (reserve.php)</h1>
-            <p>使用 <strong>POST 方法</strong> 提交。在前端進行 JavaScript 輸入驗證維持域完整性，並在後端防錯寫入：</p>
+            <h1>步驟 7: 實作預約處理網頁 (reserve.php)</h1>
+            <p>使用 <strong>POST 方法</strong> 提交資料，透過 JavaScript 進行前端基礎格式防錯，並在後端確保交易完整性：</p>
             
             <div class="code-container">
                 <div class="code-header">
@@ -398,4 +335,125 @@ $conn->set_charset("utf8mb4");
         body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f7f6; }
         .form-box { max-width: 450px; margin: auto; background: #fff; padding: 25px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         input, select { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
-        input[type="submit"] { background: #18bc9c; color: white; border: none; cursor: pointer;
+        input[type="submit"] { background: #18bc9c; color: white; border: none; cursor: pointer; font-size: 1rem; }
+    &lt;/style&gt;
+    &lt;script&gt;
+        function validateForm() {
+            var name = document.forms["bookingForm"]["fullname"].value;
+            var phone = document.forms["bookingForm"]["phone"].value;
+            if (name == "" || phone == "") {
+                alert("欄位不得為空！");
+                return false;
+            }
+            if (phone.length < 8) {
+                alert("請輸入有效的電話號碼（至少 8 位數）");
+                return false;
+            }
+            return true;
+        }
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+<div class="form-box">
+    &lt;h2&gt;餐廳現場訂座系統&lt;/h2&gt;
+    &lt;form name="bookingForm" method="POST" action="reserve.php" onsubmit="return validateForm()"&gt;
+        &lt;label&gt;顧客姓名:&lt;/label&gt;
+        &lt;input type="text" name="fullname" placeholder="例如：陳大文" required&gt;
+        
+        &lt;label&gt;電話號碼:&lt;/label&gt;
+        &lt;input type="text" name="phone" placeholder="例如：91234567" required&gt;
+        
+        &lt;label&gt;預約日期:&lt;/label&gt;
+        &lt;input type="date" name="res_date" required&gt;
+        
+        &lt;label&gt;時間:&lt;/label&gt;
+        &lt;input type="time" name="res_time" required&gt;
+        
+        &lt;label&gt;選擇餐桌:&lt;/label&gt;
+        &lt;select name="table_id"&gt;
+            &lt;option value="1"&gt;餐桌 1 (2人座位)&lt;/option&gt;
+            &lt;option value="3"&gt;餐桌 3 (4人座位)&lt;/option&gt;
+            &lt;option value="6"&gt;餐桌 6 (6人座位)&lt;/option&gt;
+        &lt;/select&gt;
+        
+        &lt;label&gt;用餐人數:&lt;/label&gt;
+        &lt;input type="number" name="party_size" min="1" max="20" required&gt;
+        
+        &lt;input type="submit" value="送出預定"&gt;
+    &lt;/form&gt;
+
+    &lt;?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        require_once 'db.php';
+        
+        $fullname = $_POST['fullname'];
+        $phone = $_POST['phone'];
+        $res_date = $_POST['res_date'];
+        $res_time = $_POST['res_time'];
+        $table_id = $_POST['table_id'];
+        $party_size = $_POST['party_size'];
+        
+        // 步驟 A: 檢查顧客是否存在
+        $chk_cust = "SELECT customer_id FROM customers WHERE phone = '$phone'";
+        $res = mysqli_query($conn, $chk_cust);
+        
+        if (mysqli_num_rows($res) > 0) {
+            $row = mysqli_fetch_assoc($res);
+            $customer_id = $row['customer_id'];
+        } else {
+            $insert_customer = "INSERT INTO customers (fullname, phone) VALUES ('$fullname', '$phone')";
+            mysqli_query($conn, $insert_customer);
+            $customer_id = $conn->insert_id;
+        }
+        
+        // 步驟 B: 寫入預約
+        $insert_res = "INSERT INTO reservations (customer_id, table_id, reservation_date, reservation_time, party_size) 
+                       VALUES ($customer_id, $table_id, '$res_date', '$res_time', $party_size)";
+        
+        if (mysqli_query($conn, $insert_res)) {
+            echo "&lt;p style='color:green; font-weight:bold; margin-top:15px;'&gt;🎉 預約成功！資料已寫入資料庫。&lt;/p&gt;";
+        } else {
+            echo "&lt;p style='color:red;'&gt;儲存失敗，錯誤訊息: " . $conn->error . "&lt;/p&gt;";
+        }
+        $conn->close();
+    }
+    ?&gt;
+</div>
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // SPA Tab switching logic
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+
+            const menuItems = document.querySelectorAll('.sidebar a');
+            menuItems.forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // Copy logic
+        function copyCode(elementId) {
+            const codeText = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const btn = event.currentTarget;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> 已複製';
+                btn.style.backgroundColor = '#2ecc71';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.backgroundColor = '';
+                }, 2000);
+            }).catch(err => {
+                alert('複製失敗: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
